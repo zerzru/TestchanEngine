@@ -1,0 +1,22 @@
+Testchan License 1.0(TCHL 1.0)
+
+Вы можете свободно скачивать, распространять, модифицировать, использовать в коммерческих и некоммерчесских целях код "TestchanEngine"(далее - Движок) всех версий, при условии, что наверху
+(header) или внизу(footer) вашей страницы написано следующее:
+
+"Powered by TestchanEngine"
+
+или
+
+"Работает на TestchanEngine"
+
+и соответствующая ссылка на следующий URL-адрес: http://scgofficial.esy.es/testchanengine/
+
+При не соблюдении единственного условия вы не можете использовать данный Движок или частями его кода.
+
+© Sharov Elisei, 2018
+© SharovCompanyGroup, 2018
+
+http://scgofficial.esy.es/
+http://scgofficial.esy.es/testchanengine/
+
+TestchanEngine build PHP5-0001a
