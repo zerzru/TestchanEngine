@@ -1,0 +1,12 @@
+﻿#<arcticle>
+<?php
+    require_once 'engine.php';
+
+    start_job('anime');
+?>
+
+#<nav>
+<?php
+    if( $page > 1 ) echo '<a href="index.php?page='.($page-1).'">← Назад</a> ';
+    if( $page < $pages ) echo '<a href="index.php?page='.($page+1).'">Вперёд →</a>';
+?>
