@@ -93,7 +93,6 @@
     };
 
     function start_job($forum) {
-        #echo '<script>alert("Движок работает");</script>';
         $conf = parse_ini_file('config.ini');
         require_once dirname(__FILE__).'\conn.php';
         require_once 'connection.php';
@@ -119,8 +118,10 @@
         $otvet = mysql_query($sql);
 
         date_default_timezone_set('Etc/GMT-3');
-        $date = date('m/d/Y h:i:s', time());
+        $date = date('d/m/Y h:i:s', time());
 
+        $DATE = $date;
+        
         function getUserIP() {
             $client = @$_SERVER['HTTP_CLIENT_IP'];
             $forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -145,20 +146,43 @@
 
         if(isset($_POST['name'])) {
             $ava = $_FILES['upload'];
-            $ava_n = dirname(__FILE__).'/'.basename($ava['name']);
+            $ava_n = dirname(__FILE__).'/images/'.basename($ava['name']);
 
             #if(!is_uploaded_file($ava['tmp_name']) || !move_uploaded_file($ava['tmp_name'], $ava_n)){ die(); }
             $sql = mysqli_query($link, "INSERT INTO `treds` (`forum`, `name`, `theme`, `post`, `picture`, `date`, `ip`) VALUES ('".$forum."', '".$_POST['name']."', '".$_POST['theme']."', '".$_POST['message']."', '".$ava['name']."', '".$date."', '".$user_ip."')") or die("Такая тема уже существует или произошла неизвестная ошибка"/*.mysqli_error($sql)*/);
+            
+            $sql2 = "SELECT `id` FROM `treds` WHERE `date` = '".$date."'";
+            $otvet2 = mysql_query($sql2);
+            $row2 = mysql_fetch_assoc($otvet2);
+            
+            $sql3 = 'CREATE TABLE `answers'.$row2["id"].'` (`id` INT(255) AUTO_INCREMENT NOT NULL, `name` VARCHAR(255) NOT NULL, `theme` VARCHAR(255) NOT NULL, `post` TEXT NOT NULL, `date` VARCHAR(255) NOT NULL, `ip` VARCHAR(255) NOT NULL, PRIMARY KEY(`id`));';
+            
+            echo $sql3;
+            $otvet3 = mysql_query($sql3);
+            
+            $fd = fopen('id.txt', 'w');
+            fwrite($fd, $row2['id']);
+            fclose($fd);
+            
+            $page_link = 'id'.$row2["id"].'.php';
+            
+            $new_page = file_get_contents('newpage.txt');
+            
+            $fd2 = fopen($page_link, 'w');
+            fwrite($fd2, $new_page);
+            fclose($fd2);
         }
         
         while($row = mysql_fetch_assoc($otvet)) {
+            $page_link = 'id'.$row["id"].'.php';
+            
             echo "<div class='tred'>
                     <span class='title'>{$row['theme']}</span>
                     -
                     <span class='author'>{$row['name']}</span>
                     <span class='date'>{$row['date']}</span>
                     <span class='id'>№{$row['id']}</span>
-                    <a id='toggleLink2' href='javascript:void(0);' onclick='viewdiv2();' data-text-show='[ Закрыть форму ]' data-text-hide='[ Ответ ]'>[ Ответ ]</a>
+                    <a href='{$page_link}'>[ Ответ ]</a>
                     <div class='media'>
                         <img src='{$row['picture']}' width='100%'>
                     </div>
@@ -173,4 +197,23 @@
         };
         mysqli_close($link);
     };
+
+    function show_answers($table) {
+        require_once "conn.php";
+        require_once "connection.php";
+
+        $sql5 = "SELECT * FROM `".$table."` ORDER BY `id`";
+        $otvet5 = mysql_query($sql5);
+        
+        while($row5 = mysql_fetch_assoc($otvet5)) {
+            echo "<div class='answer'>
+                    <span class='author'>{$row5['name']}</span>
+                    <span class='date'>{$row5['date']}</span>
+                    <span class='id'>№{$row5['id']}</span>
+                    <p class='text'>
+                        {$row5['post']}
+                    </p>
+                </div><br><br><br><br>";
+        };
+    }
 ?>
