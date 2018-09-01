@@ -220,4 +220,19 @@
                 </div><br><br><br><br>";
         };
     };
+
+    function show_forums() {
+        $json = file_get_contents('forums.json');
+        $jsonIterator = new RecursiveIteratorIterator(
+            new RecursiveArrayIterator(json_decode($json, TRUE)),
+            RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($jsonIterator as $key => $val) {
+            if(is_array($val)) {
+                echo '';
+            } else {
+                echo "<a href=$val>/$key/</a>\n";
+            }
+        }
+    }
 ?>
