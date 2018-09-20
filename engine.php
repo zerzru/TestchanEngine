@@ -29,10 +29,10 @@
             };
             
             if ($conf['show_engine_info'] == 'true') {
-                echo '<script>
-                        console.log("Название движка: '.$E_NAME.'; Версия: '.$VERSION.'; Билд: '.$BUILD.'; Лицензия: '.$LICENSE.'; Сайт: '.$SITE.'");
-                        console.log("Пользователь: '.$engine_user.'; Хост: '.$engine_host.'; Адрес: '.$engine_addres.';");
-                      </script>';
+                echo "<script>
+                        console.log('Название движка: $E_NAME; Версия: $VERSION; Билд: $BUILD; Лицензия: $LICENSE; Сайт: $SITE');
+                        console.log('Пользователь: $engine_user; Хост: $engine_host; Адрес: $engine_addres;');
+                      </script>";
             } else if ($conf['show_engine_info'] == 'false') {
                 echo '';
             } else {
@@ -51,10 +51,10 @@
             };
             
             if ($conf['show_engine_info'] == 'true') {
-                echo '<script>
-                        console.log("Engine name: '.$E_NAME.'; Engine version: '.$VERSION.'; Engine build: '.$BUILD.'; Engine license: '.$LICENSE.'; Engine site: '.$SITE.'");
-                        console.log("User: '.$engine_user.'; Host: '.$engine_host.'; Addres: '.$engine_addres.';");
-                      </script>';
+                echo "<script>
+                        console.log('Engine name: $E_NAME; Engine version: $VERSION; Engine build: $BUILD; Engine license: $LICENSE; Engine site: $SITE');
+                        console.log('User: $engine_user; Host: $engine_host; Addres: $engine_addres;');
+                      </script>";
             } else if ($conf['show_engine_info'] == 'false') {
                 echo '';
             };
@@ -74,10 +74,10 @@
             };
             
             if ($conf['show_engine_info'] == 'true') {
-                echo '<script>
-                        console.log("Engine name: '.$E_NAME.'; Engine version: '.$VERSION.'; Engine build: '.$BUILD.'; Engine license: '.$LICENSE.'; Engine site: '.$SITE.'");
-                        console.log("User: '.$engine_user.'; Host: '.$engine_host.'; Addres: '.$engine_addres.';");
-                      </script>';
+                echo "<script>
+                        console.log('Engine name: $E_NAME; Engine version: $VERSION; Engine build: $BUILD; Engine license: $LICENSE; Engine site: $SITE);
+                        console.log('User: $engine_user; Host: $engine_host; Addres: $engine_addres');
+                      </script>";
             } else if ($conf['show_engine_info'] == 'false') {
                 echo '';
             } else {
@@ -110,20 +110,20 @@
             $page = (int) $_GET['page'];
             if ($page > 0 && $page <= $pages) {
                 $start = $page * $conf['pp'] - $conf['pp'];
-                $sql = "SELECT * FROM `treds` WHERE `forum` = '{$forum}' ORDER BY `id` DESC LIMIT {$start}, {$conf['pp']}";
+                $sql = "SELECT * FROM `treds` WHERE `forum` = '$forum' ORDER BY `id` DESC LIMIT {$start}, {$conf['pp']}";
             } else {
-                $sql = "SELECT * FROM `treds` WHERE `forum` = '{$forum}' ORDER BY `id` DESC LIMIT ". $conf['pp']; 
+                $sql = "SELECT * FROM `treds` WHERE `forum` = '$forum' ORDER BY `id` DESC LIMIT ". $conf['pp']; 
                 $page = 1;
             }
         } else {
-            $sql = "SELECT * FROM `treds` WHERE `forum` = '{$forum}' ORDER BY `id` DESC LIMIT ". $conf['pp'];
+            $sql = "SELECT * FROM `treds` WHERE `forum` = '$forum' ORDER BY `id` DESC LIMIT ". $conf['pp'];
             $page = 1;
         }
         
         $otvet = mysql_query($sql);
         
         while($row = mysql_fetch_assoc($otvet)) {
-            $page_link = 'tred.php?id='.$row["id"];
+            $page_link = "tred.php?id={$row['id']}";
 
             echo "<div class='tred'>
                     <span class='title'>{$row['theme']}</span>
@@ -131,25 +131,25 @@
                     <span class='author'>{$row['name']}</span>
                     <span class='date'>{$row['date']}</span>
                     <span class='id'>№{$row['id']}</span>
-                    <a href='{$page_link}'>[ Ответ ]</a>
+                    <a href='$page_link'>[ Ответ ]</a>
                     <div class='media'>
                         <img src='{$row['picture']}' width='100%'>
                     </div>
                     <p class='text'>
                         {$row['post']}
                     </p>
-                </div><br><br><br><br>";
+                </div><br><br><br><br><br><br><br>";
         };
 
-        if ($page > 1) echo '<a href="index.php?page='.($page-1).'">← Назад</a> ';
-        if ($page < $pages) echo '<a href="index.php?page='.($page+1).'">Вперёд →</a>';
+        if ($page > 1) echo "<a href='index.php?page=($page-1)'>← Назад</a> ";
+        if ($page < $pages) echo "<a href='index.php?page=($page+1)'>Вперёд →</a>";
         
         $main_id = (int) $_GET['id'];    
 
         $hour_time = $conf['hour_time'];
         
         date_default_timezone_set('Etc/GMT-3');
-        $date = date("d/m/Y {$hour_time}:i:s", time());
+        $date = date("d/m/Y $hour_time:i:s", time());
         
         function getUserIP() {
             $client = @$_SERVER['HTTP_CLIENT_IP'];
@@ -186,18 +186,31 @@
             
             $link = mysqli_connect($host, $user, $password, $database) or die("".mysqli_error($link));
             
-            $sql = mysqli_query($link, "INSERT INTO `treds` (`forum`, `name`, `theme`, `post`, `picture`, `date`, `ip`) VALUES ('".$forum."', '".$session_username."', '".$_POST['theme']."', '".$_POST['message']."', '".$ava['name']."', '".$date."', '".$user_ip."')");
-            
-            $sql2 = "SELECT `id` FROM `treds` WHERE `date` = '".$date."'";
+            $post = $_POST['message'];
+            $post = strip_tags($post);
+            $post = str_replace('[b]', '<strong>', $post);
+            $post = str_replace('[/b]', '</strong>', $post);
+            $post = str_replace('[i]', '<i>', $post);
+            $post = str_replace('[/i]', '</i>', $post);
+            $post = str_replace('[u]', '<u>', $post);
+            $post = str_replace('[/u]', '</u>', $post);
+            $post = str_replace('[spoiler]', '<span class="spoiler">', $post);
+            $post = str_replace('[/spoiler]', '</span>', $post);
+
+            $sql = mysqli_query($link, "INSERT INTO `treds` (`forum`, `name`, `theme`, `post`, `picture`, `date`, `ip`) VALUES ('{$forum}', '{$session_username}', '{$_POST['theme']}', '{$post}', '{$ava['name']}', '{$date}', '{$user_ip}')");
+
+            $sql_double = mysqli_query($link, "INSERT INTO `anime` (`name`, `post`, `date`, `ip`) VALUES ('{$session_username}', '{$post}', '{$date}', '{$user_ip}')");
+
+            $sql2 = "SELECT `id` FROM `treds` WHERE `date` = '{$date}';";
             $otvet2 = mysql_query($sql2);
             $row2 = mysql_fetch_assoc($otvet2);
             
-            $sql3 = 'CREATE TABLE `answers'.$row2["id"].'` (`id` INT(255) AUTO_INCREMENT NOT NULL, `name` VARCHAR(255) NOT NULL, `post` TEXT NOT NULL, `date` VARCHAR(255) NOT NULL, `ip` VARCHAR(255) NOT NULL, PRIMARY KEY(`id`));';
+            $sql3 = "CREATE TABLE `answers{$row2['id']}` (`id` INT(255) AUTO_INCREMENT NOT NULL, `name` VARCHAR(255) NOT NULL, `post` TEXT NOT NULL, `date` VARCHAR(255) NOT NULL, `ip` VARCHAR(255) NOT NULL, PRIMARY KEY(`id`));";
             
             $otvet3 = mysql_query($sql3);
         }
         
-    mysqli_close($link);
+          mysqli_close($link);
     };
 
     function show_answers($table) {
@@ -206,33 +219,44 @@
         $conf = parse_ini_file('config.ini');
         $answer_background = $conf['answer_background'];
 
-        $sql5 = "SELECT * FROM `".$table."` ORDER BY `id`";
+        $sql5 = "SELECT * FROM `{$table}` ORDER BY `id`";
         $otvet5 = mysql_query($sql5);
-        
-        while($row5 = mysql_fetch_assoc($otvet5)) {
-            echo "<div class='answer' style='background:{$answer_background}'>
-                    <span class='author'>{$row5['name']}</span>
-                    <span class='date'>{$row5['date']}</span>
-                    <span class='id'>№{$row5['id']}</span>
-                    <p class='text'>
-                        {$row5['post']}
-                    </p>
-                </div><br><br><br><br>";
+
+        if($otvet5 == false) {
+            echo "<center>Здесь пока что нет ни одного ответа. Вы можете стать первым!</center>";
+        } else {
+            while($row5 = mysql_fetch_assoc($otvet5)) {
+                echo "<div class='answer' style='background:{$answer_background}'>
+                        <span class='author'>{$row5['name']}</span>
+                        <span class='date'>{$row5['date']}</span>
+                        <span class='id'>№{$row5['id']}</span>
+                        <p class='text'>
+                            {$row5['post']}
+                        </p>
+                    </div><br><br><br><br>";
+            };
         };
     };
 
     function show_forums() {
-        $json = file_get_contents('forums.json');
-        $jsonIterator = new RecursiveIteratorIterator(
-            new RecursiveArrayIterator(json_decode($json, TRUE)),
-            RecursiveIteratorIterator::SELF_FIRST);
+        $sql7 = "SELECT * FROM `forums`";
+        $otvet7 = mysql_query($sql7);
+        while($row7 = mysql_fetch_assoc($otvet7)) {
+            echo "<a href='{$row7['link']}'>/{$row7['name']}/</a> ";
+        }
+    }
 
-        foreach ($jsonIterator as $key => $val) {
-            if(is_array($val)) {
-                echo '';
-            } else {
-                echo "<a href=$val>/$key/</a>\n";
-            }
+    function show_info($thing, $forum) {
+        require_once 'conn.php';
+        require_once 'connection.php';
+
+        $link = mysqli_connect($host, $user, $password, $database) or die("".mysqli_error($link));
+        
+        $sql6 = "SELECT `{$thing}` FROM `{$forum}`;";
+        $otvet6 = mysql_query($sql6);
+        
+        while($row6 = mysql_fetch_assoc($otvet6)) {
+            echo $row6['id'];
         }
     }
 ?>
