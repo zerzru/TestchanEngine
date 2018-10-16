@@ -36,5 +36,5 @@ If you already include engine, you can use all functions. For starting work, you
 ```php
     #page code
     start_job('FORUM NAME');
-    $page code
+    #page code
 ```
